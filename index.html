@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emma's Daily Star Tracker ⭐</title>
+    <title>Emma's Star Tracker ⭐</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -122,6 +122,7 @@
             color: white;
             text-align: center;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
         .progress-bar {
             background: rgba(255,255,255,0.3);
@@ -136,6 +137,120 @@
             border-radius: 10px;
             transition: width 0.3s;
         }
+        
+        /* 新增：本周记录表格 */
+        .week-records {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .week-records h3 {
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .day-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .day-row:last-child { border-bottom: none; }
+        .day-name { font-weight: 600; color: #666; }
+        .day-stars { font-weight: bold; color: #FF6B9D; }
+        .day-stars.completed { color: #11998e; }
+        .week-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .week-total span { color: #FF6B9D; font-weight: bold; font-size: 1.3rem; }
+        
+        /* 新增：奖励规则 */
+        .rewards-list {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .rewards-list h3 {
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .reward-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        .reward-item.unlocked {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left-color: #28a745;
+        }
+        .reward-icon { font-size: 1.5rem; }
+        .reward-info { flex: 1; }
+        .reward-name { font-weight: 600; color: #333; }
+        .reward-desc { font-size: 0.85rem; color: #666; margin-top: 3px; }
+        .reward-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: #e0e0e0;
+            color: #666;
+        }
+        .reward-status.unlocked {
+            background: #28a745;
+            color: white;
+        }
+        
+        /* 新增：重置按钮 */
+        .reset-btn {
+            background: #ff6b6b;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 300px;
+        }
+        .modal-content h3 { margin-bottom: 15px; }
+        .modal-content p { margin-bottom: 20px; color: #666; }
+        .modal-buttons { display: flex; gap: 10px; }
+        .modal-buttons button { flex: 1; }
+        .btn-cancel { background: #e0e0e0; color: #333; }
+        .btn-confirm { background: #ff6b6b; color: white; }
     </style>
 </head>
 <body>
@@ -160,14 +275,77 @@
             </div>
         </div>
         
+        <!-- 6个活动卡片 -->
         <div id="activities"></div>
         
+        <!-- 本周记录 -->
+        <div class="week-records">
+            <h3>📊 This Week's Stars</h3>
+            <div id="weekList"></div>
+            <div class="week-total">
+                Total This Week: <span id="weekTotal">0</span> ⭐
+            </div>
+        </div>
+        
+        <!-- 奖励规则 -->
+        <div class="rewards-list">
+            <h3>🎁 Rewards</h3>
+            <div class="reward-item" id="reward-daily">
+                <div class="reward-icon">⭐</div>
+                <div class="reward-info">
+                    <div class="reward-name">Daily Star</div>
+                    <div class="reward-desc">Complete all 6 tasks in one day</div>
+                </div>
+                <div class="reward-status" id="status-daily">Locked</div>
+            </div>
+            <div class="reward-item" id="reward-30">
+                <div class="reward-icon">🎯</div>
+                <div class="reward-info">
+                    <div class="reward-name">30 Stars</div>
+                    <div class="reward-desc">Earn 30 stars in a week → Choose a small gift ($5-10)</div>
+                </div>
+                <div class="reward-status" id="status-30">Locked</div>
+            </div>
+            <div class="reward-item" id="reward-50">
+                <div class="reward-icon">🏆</div>
+                <div class="reward-info">
+                    <div class="reward-name">50 Stars</div>
+                    <div class="reward-desc">Earn 50 stars in a week → Weekend fun activity</div>
+                </div>
+                <div class="reward-status" id="status-50">Locked</div>
+            </div>
+            <div class="reward-item" id="reward-streak">
+                <div class="reward-icon">🔥</div>
+                <div class="reward-info">
+                    <div class="reward-name">7-Day Streak</div>
+                    <div class="reward-desc">Complete all tasks for 7 days straight → Special surprise!</div>
+                </div>
+                <div class="reward-status" id="status-streak">Locked</div>
+            </div>
+        </div>
+        
+        <!-- 今日进度 -->
         <div class="reward-box">
-            <h3>🎁 Weekly Reward Progress</h3>
+            <h3>🎁 Today's Progress</h3>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressBar" style="width: 0%"></div>
             </div>
-            <p id="progressText">Complete tasks to earn stars!</p>
+            <div id="progressText">Complete tasks to earn stars!</div>
+        </div>
+        
+        <!-- 管理按钮 -->
+        <button class="reset-btn" onclick="showResetModal()">🔄 New Week (Reset)</button>
+    </div>
+
+    <!-- 确认弹窗 -->
+    <div class="modal" id="resetModal">
+        <div class="modal-content">
+            <h3>🔄 New Week?</h3>
+            <p>This will save this week's record and start fresh. Are you sure?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="hideResetModal()">Cancel</button>
+                <button class="btn-confirm" onclick="resetWeek()">Yes, New Week</button>
+            </div>
         </div>
     </div>
 
@@ -181,8 +359,52 @@
             { id: 'chores', name: 'Help with Chores', emoji: '🧹', target: 1, unit: 'time' }
         ];
         
-        let data = JSON.parse(localStorage.getItem('emmaData')) || {};
-        if (!data.today) data = { today: {}, history: [], streak: 0 };
+        // 数据结构：每天记录
+        let data = JSON.parse(localStorage.getItem('emmaData')) || {
+            today: {},
+            weekHistory: [], // 每天的总星星数
+            currentWeek: [], // 本周每天记录
+            streak: 0,
+            lastDate: new Date().toDateString()
+        };
+        
+        // 检查是否是新的一天
+        function checkNewDay() {
+            const today = new Date().toDateString();
+            if (data.lastDate !== today && Object.keys(data.today).length > 0) {
+                // 保存昨天记录
+                saveDayToHistory();
+                data.today = {};
+                data.lastDate = today;
+                save();
+            }
+        }
+        
+        // 保存一天到历史
+        function saveDayToHistory() {
+            const completed = Object.values(data.today).filter(v => v >= 1).length;
+            const stars = completed * 5;
+            const dayName = new Date(data.lastDate).toLocaleDateString('en-US', { weekday: 'short' });
+            
+            data.currentWeek.push({
+                day: dayName,
+                date: data.lastDate,
+                stars: stars,
+                completed: completed
+            });
+            
+            // 保持只有7天
+            if (data.currentWeek.length > 7) {
+                data.currentWeek.shift();
+            }
+            
+            // 更新连续打卡
+            if (completed === 6) {
+                data.streak++;
+            } else {
+                data.streak = 0;
+            }
+        }
         
         function save() {
             localStorage.setItem('emmaData', JSON.stringify(data));
@@ -190,18 +412,18 @@
         
         function updateDate() {
             const d = new Date();
-            document.getElementById('date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            document.getElementById('date').textContent = d.toLocaleDateString('en-US', { 
+                weekday: 'long', month: 'short', day: 'numeric' 
+            });
         }
         
-        function render() {
+        function renderActivities() {
             const container = document.getElementById('activities');
             let html = '';
-            let completed = 0;
             
             activities.forEach(act => {
                 const val = data.today[act.id] || 0;
                 const checked = val >= act.target;
-                if (checked) completed++;
                 
                 html += `
                     <div class="activity-card">
@@ -215,11 +437,12 @@
                         <div class="controls">
                             <div class="input-box">
                                 <input type="number" value="${val}" min="0" 
-                                    onchange="update('${act.id}', this.value)"
-                                    id="input-${act.id}">
+                                    onchange="update('${act.id}', this.value)">
                                 <span>${act.unit}</span>
                             </div>
-                            <button class="btn-add" onclick="add('${act.id}', ${act.target > 5 ? 5 : 1})">+${act.target > 5 ? 5 : 1}</button>
+                            <button class="btn-add" onclick="add('${act.id}', ${act.target > 5 ? 5 : 1})">
+                                +${act.target > 5 ? 5 : 1}
+                            </button>
                             ${act.target > 20 ? `<button class="btn-add" onclick="add('${act.id}', 10)">+10</button>` : ''}
                             <button class="btn-check ${checked ? 'active' : ''}" onclick="check('${act.id}')">
                                 ${checked ? '✓' : '○'}
@@ -230,7 +453,6 @@
             });
             
             container.innerHTML = html;
-            updateStats(completed);
         }
         
         function update(id, val) {
@@ -249,27 +471,130 @@
             if (!data.today[id] || data.today[id] < act.target) {
                 update(id, act.target);
             }
-            celebrate();
         }
         
-        function celebrate() {
-            const btn = event.target;
-            btn.style.transform = 'scale(1.2)';
-            setTimeout(() => btn.style.transform = 'scale(1)', 200);
+        function renderWeekList() {
+            const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const today = new Date().getDay();
+            let html = '';
+            let total = 0;
+            
+            // 显示本周每天
+            for (let i = 0; i < 7; i++) {
+                const dayData = data.currentWeek.find(d => {
+                    const dDay = new Date(d.date).getDay();
+                    return dDay === i;
+                });
+                
+                const isToday = i === today;
+                const dayName = weekDays[i];
+                const stars = dayData ? dayData.stars : 0;
+                const completed = dayData && dayData.stars === 30;
+                
+                total += stars;
+                
+                html += `
+                    <div class="day-row">
+                        <span class="day-name">${dayName} ${isToday ? '(Today)' : ''}</span>
+                        <span class="day-stars ${completed ? 'completed' : ''}">
+                            ${stars > 0 ? stars + ' ⭐' : '-'}
+                        </span>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('weekList').innerHTML = html;
+            document.getElementById('weekTotal').textContent = total;
+            
+            return total;
         }
         
-        function updateStats(completed) {
-            const stars = completed * 5;
-            document.getElementById('todayStars').textContent = stars;
-            document.getElementById('weekStars').textContent = stars + (data.history.length * 30);
+        function updateRewards(weekTotal) {
+            const todayCompleted = Object.values(data.today).filter(v => v >= 1).length;
+            const todayStars = todayCompleted * 5;
+            
+            // 每日奖励
+            const dailyEl = document.getElementById('reward-daily');
+            const dailyStatus = document.getElementById('status-daily');
+            if (todayStars === 30) {
+                dailyEl.classList.add('unlocked');
+                dailyStatus.classList.add('unlocked');
+                dailyStatus.textContent = 'Unlocked! 🎉';
+            }
+            
+            // 30星奖励
+            const r30El = document.getElementById('reward-30');
+            const r30Status = document.getElementById('status-30');
+            if (weekTotal >= 30) {
+                r30El.classList.add('unlocked');
+                r30Status.classList.add('unlocked');
+                r30Status.textContent = 'Unlocked! 🎉';
+            }
+            
+            // 50星奖励
+            const r50El = document.getElementById('reward-50');
+            const r50Status = document.getElementById('status-50');
+            if (weekTotal >= 50) {
+                r50El.classList.add('unlocked');
+                r50Status.classList.add('unlocked');
+                r50Status.textContent = 'Unlocked! 🎉';
+            }
+            
+            // 连续7天奖励
+            const streakEl = document.getElementById('reward-streak');
+            const streakStatus = document.getElementById('status-streak');
+            if (data.streak >= 7) {
+                streakEl.classList.add('unlocked');
+                streakStatus.classList.add('unlocked');
+                streakStatus.textContent = 'Unlocked! 🎉';
+            }
+        }
+        
+        function render() {
+            checkNewDay();
+            renderActivities();
+            const weekTotal = renderWeekList();
+            updateRewards(weekTotal);
+            
+            // 更新今日统计
+            const completed = Object.values(data.today).filter(v => v >= 1).length;
+            const todayStars = completed * 5;
+            document.getElementById('todayStars').textContent = todayStars;
+            document.getElementById('weekStars').textContent = weekTotal;
             document.getElementById('streak').textContent = data.streak;
             
+            // 进度条
             const pct = (completed / activities.length) * 100;
             document.getElementById('progressBar').style.width = pct + '%';
             document.getElementById('progressText').textContent = 
-                completed === activities.length ? "🎉 All done! Great job!" : `${activities.length - completed} more to go!`;
+                completed === 6 ? "🎉 All done! Great job!" : `${6 - completed} more to go!`;
         }
         
+        // 重置本周
+        function showResetModal() {
+            document.getElementById('resetModal').classList.add('active');
+        }
+        
+        function hideResetModal() {
+            document.getElementById('resetModal').classList.remove('active');
+        }
+        
+        function resetWeek() {
+            // 保存本周到历史
+            if (data.currentWeek.length > 0) {
+                data.weekHistory.push([...data.currentWeek]);
+            }
+            // 清空本周
+            data.currentWeek = [];
+            data.today = {};
+            data.streak = 0;
+            save();
+            hideResetModal();
+            render();
+            alert('New week started! Good luck Emma! 🌟');
+        }
+        
+        // 初始化
         updateDate();
         render();
     </script>
