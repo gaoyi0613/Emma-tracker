@@ -96,6 +96,7 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 0.9rem;
+            touch-action: manipulation;
         }
         .btn-add {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -115,30 +116,6 @@
             color: white;
         }
         
-        .reward-box {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            border-radius: 20px;
-            padding: 25px;
-            color: white;
-            text-align: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        .progress-bar {
-            background: rgba(255,255,255,0.3);
-            height: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: white;
-            border-radius: 10px;
-            transition: width 0.3s;
-        }
-        
-        /* 新增：本周记录表格 */
         .week-records {
             background: white;
             border-radius: 20px;
@@ -149,9 +126,6 @@
         .week-records h3 {
             margin-bottom: 15px;
             color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         .day-row {
             display: flex;
@@ -162,7 +136,6 @@
         .day-row:last-child { border-bottom: none; }
         .day-name { font-weight: 600; color: #666; }
         .day-stars { font-weight: bold; color: #FF6B9D; }
-        .day-stars.completed { color: #11998e; }
         .week-total {
             margin-top: 15px;
             padding-top: 15px;
@@ -172,7 +145,6 @@
         }
         .week-total span { color: #FF6B9D; font-weight: bold; font-size: 1.3rem; }
         
-        /* 新增：奖励规则 */
         .rewards-list {
             background: white;
             border-radius: 20px;
@@ -183,9 +155,6 @@
         .rewards-list h3 {
             margin-bottom: 15px;
             color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
         .reward-item {
             display: flex;
@@ -198,7 +167,7 @@
             border-left: 4px solid #667eea;
         }
         .reward-item.unlocked {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            background: #d4edda;
             border-left-color: #28a745;
         }
         .reward-icon { font-size: 1.5rem; }
@@ -218,14 +187,36 @@
             color: white;
         }
         
-        /* 新增：重置按钮 */
+        .reward-box {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            height: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
         .reset-btn {
             background: #ff6b6b;
             color: white;
-            padding: 12px 20px;
+            padding: 15px;
             border-radius: 10px;
-            margin-top: 10px;
             width: 100%;
+            font-size: 1rem;
+            margin-bottom: 20px;
         }
         
         .modal {
@@ -244,6 +235,7 @@
             border-radius: 20px;
             text-align: center;
             max-width: 300px;
+            margin: 20px;
         }
         .modal-content h3 { margin-bottom: 15px; }
         .modal-content p { margin-bottom: 20px; color: #666; }
@@ -275,19 +267,24 @@
             </div>
         </div>
         
-        <!-- 6个活动卡片 -->
         <div id="activities"></div>
         
-        <!-- 本周记录 -->
         <div class="week-records">
             <h3>📊 This Week's Stars</h3>
-            <div id="weekList"></div>
+            <div id="weekList">
+                <div class="day-row"><span class="day-name">Sun</span><span class="day-stars">-</span></div>
+                <div class="day-row"><span class="day-name">Mon</span><span class="day-stars">-</span></div>
+                <div class="day-row"><span class="day-name">Tue</span><span class="day-stars">-</span></div>
+                <div class="day-row"><span class="day-name">Wed</span><span class="day-stars">-</span></div>
+                <div class="day-row"><span class="day-name">Thu</span><span class="day-stars">-</span></div>
+                <div class="day-row"><span class="day-name">Fri (Today)</span><span class="day-stars" id="todayWeek">0 ⭐</span></div>
+                <div class="day-row"><span class="day-name">Sat</span><span class="day-stars">-</span></div>
+            </div>
             <div class="week-total">
                 Total This Week: <span id="weekTotal">0</span> ⭐
             </div>
         </div>
         
-        <!-- 奖励规则 -->
         <div class="rewards-list">
             <h3>🎁 Rewards</h3>
             <div class="reward-item" id="reward-daily">
@@ -302,7 +299,7 @@
                 <div class="reward-icon">🎯</div>
                 <div class="reward-info">
                     <div class="reward-name">30 Stars</div>
-                    <div class="reward-desc">Earn 30 stars in a week → Choose a small gift ($5-10)</div>
+                    <div class="reward-desc">Earn 30 stars → Small gift ($5-10)</div>
                 </div>
                 <div class="reward-status" id="status-30">Locked</div>
             </div>
@@ -310,7 +307,7 @@
                 <div class="reward-icon">🏆</div>
                 <div class="reward-info">
                     <div class="reward-name">50 Stars</div>
-                    <div class="reward-desc">Earn 50 stars in a week → Weekend fun activity</div>
+                    <div class="reward-desc">Earn 50 stars → Weekend fun!</div>
                 </div>
                 <div class="reward-status" id="status-50">Locked</div>
             </div>
@@ -318,13 +315,12 @@
                 <div class="reward-icon">🔥</div>
                 <div class="reward-info">
                     <div class="reward-name">7-Day Streak</div>
-                    <div class="reward-desc">Complete all tasks for 7 days straight → Special surprise!</div>
+                    <div class="reward-desc">Complete all tasks for 7 days → Special surprise!</div>
                 </div>
                 <div class="reward-status" id="status-streak">Locked</div>
             </div>
         </div>
         
-        <!-- 今日进度 -->
         <div class="reward-box">
             <h3>🎁 Today's Progress</h3>
             <div class="progress-bar">
@@ -333,23 +329,22 @@
             <div id="progressText">Complete tasks to earn stars!</div>
         </div>
         
-        <!-- 管理按钮 -->
-        <button class="reset-btn" onclick="showResetModal()">🔄 New Week (Reset)</button>
+        <button class="reset-btn" onclick="showReset()">🔄 New Week (Reset)</button>
     </div>
 
-    <!-- 确认弹窗 -->
     <div class="modal" id="resetModal">
         <div class="modal-content">
             <h3>🔄 New Week?</h3>
-            <p>This will save this week's record and start fresh. Are you sure?</p>
+            <p>Start fresh? This will save this week's data.</p>
             <div class="modal-buttons">
-                <button class="btn-cancel" onclick="hideResetModal()">Cancel</button>
-                <button class="btn-confirm" onclick="resetWeek()">Yes, New Week</button>
+                <button class="btn-cancel" onclick="hideReset()">Cancel</button>
+                <button class="btn-confirm" onclick="doReset()">Yes</button>
             </div>
         </div>
     </div>
 
     <script>
+        // 活动配置
         const activities = [
             { id: 'piano', name: 'Piano Practice', emoji: '🎹', target: 20, unit: 'min' },
             { id: 'violin', name: 'Violin Practice', emoji: '🎻', target: 40, unit: 'min' },
@@ -358,65 +353,37 @@
             { id: 'sports', name: 'Sports & Exercise', emoji: '⚽', target: 20, unit: 'min' },
             { id: 'chores', name: 'Help with Chores', emoji: '🧹', target: 1, unit: 'time' }
         ];
-        
-        // 数据结构：每天记录
-        let data = JSON.parse(localStorage.getItem('emmaData')) || {
-            today: {},
-            weekHistory: [], // 每天的总星星数
-            currentWeek: [], // 本周每天记录
-            streak: 0,
-            lastDate: new Date().toDateString()
-        };
-        
-        // 检查是否是新的一天
-        function checkNewDay() {
-            const today = new Date().toDateString();
-            if (data.lastDate !== today && Object.keys(data.today).length > 0) {
-                // 保存昨天记录
-                saveDayToHistory();
-                data.today = {};
-                data.lastDate = today;
-                save();
-            }
-        }
-        
-        // 保存一天到历史
-        function saveDayToHistory() {
-            const completed = Object.values(data.today).filter(v => v >= 1).length;
-            const stars = completed * 5;
-            const dayName = new Date(data.lastDate).toLocaleDateString('en-US', { weekday: 'short' });
-            
-            data.currentWeek.push({
-                day: dayName,
-                date: data.lastDate,
-                stars: stars,
-                completed: completed
-            });
-            
-            // 保持只有7天
-            if (data.currentWeek.length > 7) {
-                data.currentWeek.shift();
-            }
-            
-            // 更新连续打卡
-            if (completed === 6) {
-                data.streak++;
+
+        // 数据存储 - 尝试读取旧数据
+        let data;
+        try {
+            const saved = localStorage.getItem('emmaData');
+            if (saved) {
+                data = JSON.parse(saved);
+                // 检查是否需要迁移旧格式数据
+                if (!data.weekData) {
+                    data = { today: {}, weekData: {}, streak: 0 };
+                }
             } else {
-                data.streak = 0;
+                data = { today: {}, weekData: {}, streak: 0 };
             }
+        } catch (e) {
+            data = { today: {}, weekData: {}, streak: 0 };
         }
-        
-        function save() {
+
+        // 保存数据
+        function saveData() {
             localStorage.setItem('emmaData', JSON.stringify(data));
         }
-        
+
+        // 更新日期
         function updateDate() {
             const d = new Date();
-            document.getElementById('date').textContent = d.toLocaleDateString('en-US', { 
-                weekday: 'long', month: 'short', day: 'numeric' 
-            });
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+            document.getElementById('date').textContent = d.toLocaleDateString('en-US', options);
         }
-        
+
+        // 渲染活动
         function renderActivities() {
             const container = document.getElementById('activities');
             let html = '';
@@ -436,15 +403,15 @@
                         </div>
                         <div class="controls">
                             <div class="input-box">
-                                <input type="number" value="${val}" min="0" 
-                                    onchange="update('${act.id}', this.value)">
+                                <input type="number" id="inp-${act.id}" value="${val}" min="0" 
+                                    onchange="updateVal('${act.id}', this.value)">
                                 <span>${act.unit}</span>
                             </div>
-                            <button class="btn-add" onclick="add('${act.id}', ${act.target > 5 ? 5 : 1})">
+                            <button class="btn-add" onclick="addVal('${act.id}', ${act.target > 5 ? 5 : 1})">
                                 +${act.target > 5 ? 5 : 1}
                             </button>
-                            ${act.target > 20 ? `<button class="btn-add" onclick="add('${act.id}', 10)">+10</button>` : ''}
-                            <button class="btn-check ${checked ? 'active' : ''}" onclick="check('${act.id}')">
+                            ${act.target > 20 ? `<button class="btn-add" onclick="addVal('${act.id}', 10)">+10</button>` : ''}
+                            <button class="btn-check ${checked ? 'active' : ''}" onclick="toggleCheck('${act.id}')" id="chk-${act.id}">
                                 ${checked ? '✓' : '○'}
                             </button>
                         </div>
@@ -454,149 +421,178 @@
             
             container.innerHTML = html;
         }
-        
-        function update(id, val) {
-            data.today[id] = parseInt(val) || 0;
-            save();
-            render();
+
+        // 更新数值
+        function updateVal(id, val) {
+            const num = parseInt(val) || 0;
+            data.today[id] = num;
+            saveData();
+            updateDisplay();
         }
-        
-        function add(id, amount) {
+
+        // 增加数值
+        function addVal(id, amount) {
             const current = data.today[id] || 0;
-            update(id, current + amount);
+            updateVal(id, current + amount);
         }
-        
-        function check(id) {
+
+        // 切换完成状态
+        function toggleCheck(id) {
             const act = activities.find(a => a.id === id);
-            if (!data.today[id] || data.today[id] < act.target) {
-                update(id, act.target);
+            const current = data.today[id] || 0;
+            
+            if (current < act.target) {
+                // 如果没达到目标，直接设为完成
+                updateVal(id, act.target);
+            } else {
+                // 如果已完成，取消完成（设为0）
+                updateVal(id, 0);
             }
         }
-        
-        function renderWeekList() {
-            const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        // 更新显示
+        function updateDisplay() {
+            // 计算今日完成数
+            let completed = 0;
+            activities.forEach(act => {
+                const val = data.today[act.id] || 0;
+                if (val >= act.target) completed++;
+                
+                // 更新按钮状态
+                const btn = document.getElementById('chk-' + act.id);
+                if (btn) {
+                    if (val >= act.target) {
+                        btn.classList.add('active');
+                        btn.textContent = '✓';
+                    } else {
+                        btn.classList.remove('active');
+                        btn.textContent = '○';
+                    }
+                }
+                
+                // 更新输入框
+                const inp = document.getElementById('inp-' + act.id);
+                if (inp && inp.value != val) {
+                    inp.value = val;
+                }
+            });
+
+            // 今日星星
+            const todayStars = completed * 5;
+            document.getElementById('todayStars').textContent = todayStars;
+            
+            // 本周星星（简化计算）
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             const today = new Date().getDay();
-            let html = '';
-            let total = 0;
+            let weekTotal = todayStars;
             
-            // 显示本周每天
-            for (let i = 0; i < 7; i++) {
-                const dayData = data.currentWeek.find(d => {
-                    const dDay = new Date(d.date).getDay();
-                    return dDay === i;
-                });
-                
-                const isToday = i === today;
-                const dayName = weekDays[i];
-                const stars = dayData ? dayData.stars : 0;
-                const completed = dayData && dayData.stars === 30;
-                
-                total += stars;
-                
-                html += `
-                    <div class="day-row">
-                        <span class="day-name">${dayName} ${isToday ? '(Today)' : ''}</span>
-                        <span class="day-stars ${completed ? 'completed' : ''}">
-                            ${stars > 0 ? stars + ' ⭐' : '-'}
-                        </span>
-                    </div>
-                `;
-            }
+            // 保存今日到本周数据
+            data.weekData[dayNames[today]] = todayStars;
+            saveData();
             
-            document.getElementById('weekList').innerHTML = html;
-            document.getElementById('weekTotal').textContent = total;
+            // 计算本周总计
+            Object.values(data.weekData).forEach(stars => {
+                weekTotal += stars;
+            });
+            // 避免重复计算今天
+            weekTotal = weekTotal - todayStars + todayStars;
             
-            return total;
+            document.getElementById('weekStars').textContent = weekTotal;
+            document.getElementById('weekTotal').textContent = weekTotal;
+            document.getElementById('todayWeek').textContent = todayStars + ' ⭐';
+            
+            // 连续打卡（简化）
+            document.getElementById('streak').textContent = data.streak || 0;
+            
+            // 进度条
+            const pct = (completed / 6) * 100;
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressText').textContent = 
+                completed === 6 ? '🎉 All done! Great job!' : (6 - completed) + ' more to go!';
+            
+            // 奖励状态
+            updateRewards(todayStars, weekTotal);
         }
-        
-        function updateRewards(weekTotal) {
-            const todayCompleted = Object.values(data.today).filter(v => v >= 1).length;
-            const todayStars = todayCompleted * 5;
-            
-            // 每日奖励
+
+        // 更新奖励
+        function updateRewards(todayStars, weekTotal) {
+            // Daily Star
             const dailyEl = document.getElementById('reward-daily');
             const dailyStatus = document.getElementById('status-daily');
             if (todayStars === 30) {
                 dailyEl.classList.add('unlocked');
                 dailyStatus.classList.add('unlocked');
                 dailyStatus.textContent = 'Unlocked! 🎉';
+            } else {
+                dailyEl.classList.remove('unlocked');
+                dailyStatus.classList.remove('unlocked');
+                dailyStatus.textContent = 'Locked';
             }
             
-            // 30星奖励
+            // 30 Stars
             const r30El = document.getElementById('reward-30');
             const r30Status = document.getElementById('status-30');
             if (weekTotal >= 30) {
                 r30El.classList.add('unlocked');
                 r30Status.classList.add('unlocked');
                 r30Status.textContent = 'Unlocked! 🎉';
+            } else {
+                r30El.classList.remove('unlocked');
+                r30Status.classList.remove('unlocked');
+                r30Status.textContent = 'Locked';
             }
             
-            // 50星奖励
+            // 50 Stars
             const r50El = document.getElementById('reward-50');
             const r50Status = document.getElementById('status-50');
             if (weekTotal >= 50) {
                 r50El.classList.add('unlocked');
                 r50Status.classList.add('unlocked');
                 r50Status.textContent = 'Unlocked! 🎉';
+            } else {
+                r50El.classList.remove('unlocked');
+                r50Status.classList.remove('unlocked');
+                r50Status.textContent = 'Locked';
             }
             
-            // 连续7天奖励
+            // 7-Day Streak
             const streakEl = document.getElementById('reward-streak');
             const streakStatus = document.getElementById('status-streak');
             if (data.streak >= 7) {
                 streakEl.classList.add('unlocked');
                 streakStatus.classList.add('unlocked');
                 streakStatus.textContent = 'Unlocked! 🎉';
+            } else {
+                streakEl.classList.remove('unlocked');
+                streakStatus.classList.remove('unlocked');
+                streakStatus.textContent = 'Locked';
             }
         }
-        
-        function render() {
-            checkNewDay();
-            renderActivities();
-            const weekTotal = renderWeekList();
-            updateRewards(weekTotal);
-            
-            // 更新今日统计
-            const completed = Object.values(data.today).filter(v => v >= 1).length;
-            const todayStars = completed * 5;
-            document.getElementById('todayStars').textContent = todayStars;
-            document.getElementById('weekStars').textContent = weekTotal;
-            document.getElementById('streak').textContent = data.streak;
-            
-            // 进度条
-            const pct = (completed / activities.length) * 100;
-            document.getElementById('progressBar').style.width = pct + '%';
-            document.getElementById('progressText').textContent = 
-                completed === 6 ? "🎉 All done! Great job!" : `${6 - completed} more to go!`;
-        }
-        
-        // 重置本周
-        function showResetModal() {
+
+        // 重置功能
+        function showReset() {
             document.getElementById('resetModal').classList.add('active');
         }
-        
-        function hideResetModal() {
+
+        function hideReset() {
             document.getElementById('resetModal').classList.remove('active');
         }
-        
-        function resetWeek() {
-            // 保存本周到历史
-            if (data.currentWeek.length > 0) {
-                data.weekHistory.push([...data.currentWeek]);
-            }
-            // 清空本周
-            data.currentWeek = [];
+
+        function doReset() {
             data.today = {};
+            data.weekData = {};
             data.streak = 0;
-            save();
-            hideResetModal();
-            render();
+            saveData();
+            hideReset();
+            renderActivities();
+            updateDisplay();
             alert('New week started! Good luck Emma! 🌟');
         }
-        
+
         // 初始化
         updateDate();
-        render();
+        renderActivities();
+        updateDisplay();
     </script>
 </body>
 </html>
